@@ -13,10 +13,7 @@
                 "@.vscode/Link.rsp",
                 "@.vscode/Link.Debug.rsp"
             ],
-            "group":{
-                "kind": "build",
-                "isDefault": true
-            }
+            "group": "build"
         },
         {
             "type": "shell",
@@ -28,7 +25,10 @@
                 "@.vscode/Link.rsp",
                 "@.vscode/Link.Release.rsp"
             ],
-            "group": "build"
+            "group":{
+                "kind": "build",
+                "isDefault": true
+            }
         },
         {
             "type": "shell",
