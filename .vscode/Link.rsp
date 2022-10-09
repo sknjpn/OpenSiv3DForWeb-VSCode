@@ -1,4 +1,4 @@
--o index.html
+-o ./public/index.html
 
 -LOpenSiv3D/lib 
 -LOpenSiv3D/lib/Siv3D/freetype
