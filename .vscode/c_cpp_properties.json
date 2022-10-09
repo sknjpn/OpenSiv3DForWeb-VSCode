@@ -3,7 +3,6 @@
         {
             "name": "Emscripten on Windows",
             "includePath": [
-                "${workspaceFolder}/**",
                 "${workspaceFolder}/OpenSiv3D/include",
                 "${workspaceFolder}/OpenSiv3D/include/ThirdParty"
             ],
@@ -15,7 +14,6 @@
         {
             "name": "Emscripten on Linux",
             "includePath": [
-                "${workspaceFolder}/**",
                 "${workspaceFolder}/OpenSiv3D/include",
                 "${workspaceFolder}/OpenSiv3D/include/ThirdParty"
             ],
