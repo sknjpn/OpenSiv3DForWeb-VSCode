@@ -1,3 +1,7 @@
+テスト環境
+Ubuntu 22.04
+Nginx
+
 # OpenSiv3D For Web  Visual Studio Codeサンプルプログラム実行用パッケージ
 
 ## 概要
