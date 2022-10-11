@@ -1,27 +1,83 @@
-#include <Siv3D.hpp>
-
-EM_JS(int, GetCanvasWidth, (), { return canvas.width; });
-EM_JS(int, GetCanvasHeight, (), { return canvas.height; });
+﻿#include "MainViewer.h"
+#include "TitleViewer.h"
+#include "World.h"
 
 void Main()
 {
-    // resourcesから削除しているため、絵文字及びPrintはASCIIを除いて使えない。
+  // Configの作成
+  if (!FileSystem::Exists(U"config.ini"))
+    INI().save(U"config.ini");
 
-    Console << U"Hello World!";
+  Profiler::EnableAssetCreationWarning(false);
 
-    Scene::SetBackground(ColorF{0.8, 0.9, 1.0});
+  const Array<FilePathView> musicFiles = {
+    U"天のきざはし",
+    U"沈む。",
+    U"かみさまのゆりかご",
+    U"真相探求",
+    U"安らぎと微睡み"
+  };
 
-    const Font font{60};
+  for (const auto& musicFile : musicFiles)
+    if (!FileSystem::Exists(U"resources/music/" + musicFile + U".mp3"))
+      GeneralSetting::GetInstance().m_audioEnabled = false;
 
-    while (System::Update())
+  // loadBGM
+  if (GeneralSetting::GetInstance().m_audioEnabled)
+  {
+#if defined(_WIN32) && defined(USE_MUSIC_RESOURCE_FILES)
+
+    for (const auto& musicFile : musicFiles)
+      AudioAsset::Register(musicFile, Resource(U"resources/music/" + musicFile + U".mp3"));
+#else
+    for (const auto& musicFile : musicFiles)
+      AudioAsset::Register(musicFile, U"resources/music/" + musicFile + U".mp3");
+#endif
+
+    for (const auto& musicFile : musicFiles)
+      AudioAsset::LoadAsync(musicFile);
+  }
+
+  // Cursor設定
+  if (GeneralSetting::GetInstance().m_touchPanelModeEnabled)
+    Cursor::SetDefaultStyle(CursorStyle::Hidden);
+
+  Window::SetTitle(U"SyLife");
+  Window::SetStyle(WindowStyle::Sizable);
+  Scene::SetResizeMode(ResizeMode::Keep);
+  Scene::Resize(GeneralSetting::GetInstance().m_sceneSize);
+
+  // Window設定
+  if (GeneralSetting::GetInstance().m_fullScreenEnabled)
+  {
+    Window::SetFullscreen(true);
+  }
+  else
+  {
+    Window::Maximize();
+  }
+
+  if (GeneralSetting::GetInstance().m_runTitleEnabled)
+  {
+    EasyViewer::GetRootViewer()->addChildViewer<TitleViewer>();
+  }
+  else
+  {
+    // world生成
+    if (FileSystem::Exists(U"world/"))
     {
-        Window::Resize(GetCanvasWidth(), GetCanvasHeight());
-
-        font(U"Hello, Siv3D!").drawAt(Scene::Center(), Palette::Black);
-
-        Circle{Cursor::Pos(), 40}.draw(ColorF{1, 0, 0, 0.5});
-
-        if (KeyA.down())
-            Console << Sample({U"Hello!", U"こんにちは", U"你好", U"안녕하세요?"});
+      World::Load(U"world/");
     }
+    else
+    {
+      World::Make();
+      World::GetInstance()->setName(U"New World");
+    }
+
+    EasyViewer::GetRootViewer()->addChildViewer<MainViewer>();
+  }
+
+  EasyViewer::Run();
+
+  GeneralSetting::GetInstance().save();
 }
